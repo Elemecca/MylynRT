@@ -27,5 +27,15 @@
             name="%RtConnectorUi.name">
       </connectorUi>
    </extension>
+   <extension
+         point="org.eclipse.mylyn.tasks.core.templates">
+      <repository
+            addAutomatically="false"
+            anonymous="true"
+            label="Best Practical"
+            repositoryKind="rt"
+            urlRepository="http://issues.bestpractical.com">
+      </repository>
+   </extension>
 
 </plugin>

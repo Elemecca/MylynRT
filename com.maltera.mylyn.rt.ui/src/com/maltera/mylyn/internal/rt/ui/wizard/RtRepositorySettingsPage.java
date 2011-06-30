@@ -11,6 +11,9 @@
 
 package com.maltera.mylyn.internal.rt.ui.wizard;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.eclipse.mylyn.tasks.core.TaskRepository;
 import org.eclipse.mylyn.tasks.ui.wizards.AbstractRepositorySettingsPage;
 import org.eclipse.swt.widgets.Composite;
@@ -48,7 +51,18 @@ public class RtRepositorySettingsPage extends AbstractRepositorySettingsPage {
 
 	@Override
 	protected boolean isValidUrl(String url) {
-		// TODO Auto-generated method stub
+		if ((url.startsWith(URL_PREFIX_HTTPS) || url.startsWith(URL_PREFIX_HTTP)) && !url.endsWith("/")) { //$NON-NLS-1$
+			try {
+				new URL(url);
+				return true;
+			} catch (MalformedURLException e) {
+			}
+		}
+		return false;
+	}
+	
+	@Override
+	public boolean canValidate() {
 		return false;
 	}
 
