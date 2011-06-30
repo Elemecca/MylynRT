@@ -32,10 +32,7 @@ public class RtRepositorySettingsPage extends AbstractRepositorySettingsPage {
 	
 	public RtRepositorySettingsPage(TaskRepository taskRepository) {
 		super(TITLE, DESCRIPTION, taskRepository);
-		setNeedsCertAuth(true);
-		setNeedsAnonymousLogin(true);
 		setNeedsEncoding(false);
-		setNeedsTimeZone(false);
 	}
 
 	@Override
