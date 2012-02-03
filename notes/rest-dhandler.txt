@@ -1,0 +1,27 @@
+
+in entity body, use LF instead of CRLF for line ending
+
+request entity should be multipart/form-data
+can be any HTML form submission method, but multipart is best
+
+accepts four parameters: id, fields, format, content
+id may occur multiple times, the rest may not
+
+@REST/1.0/dhandler:98
+id is used for 'show' and '<type>/show' requests, ignored otherwise
+it specifies which objects are to be shown
+TODO: explore parsing
+
+@REST/1.0/dhandler:128
+requests to 'edit' and '<type>/edit'
+
+
+@REST/1.0/dhandler:207
+fields is a comma-separated list of field names
+the value may not start or end with whitespace, nor is it permitted around the commas
+
+
+response entity body starts with another status line
+like HTTP, is 'RT/<version> <code> <message>'
+status line is followed by an empty line, then the response body
+

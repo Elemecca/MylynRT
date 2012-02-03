@@ -1,0 +1,59 @@
+@lib/RT/Interface/REST.pm:107
+
+Vars:
+c - {string} form comment block
+	text is exactly as in the request
+	if no comments, empty string
+	always ends with a line feed
+o - {array} list of used keys
+k - {hash} keys to values as strings or arrays of strings
+e - error message?
+state - numeric state flag
+	 0 - beginning of form / comment block
+	 1 - after comments / KVP block
+	-1 - syntax error
+
+blank lines are ignored
+
+a line containing exactly '--' (two hyphens) denotes the end of a form
+empty forms are ignored
+
+lines whose first character is '#' are comments
+comments only allowed at start of form
+
+forms use non-capturing fields, so full field name regex is:
+(?i:[a-z][a-z0-9_-]*|(?i:CF\.\{[\sa-z0-9_ :()/-]+\}|C(?:ustom)?F(?:ield)?-[\sa-z0-9_ :()/-]+))
+it's always used with the case-insensitive modifier
+
+field names must start with an alpha
+allow only alphas, numbers, underbar, hyphen
+can be empty? repeater is '*'. probably shouldn't push it.
+	TODO: this might be a bug, ask
+	@lib/RT/Interface/REST.pm:73
+
+custom fields are enclosed in 'CF.{<name>}'
+permit alphas, digits, underbar, whitespace, colon, parens, slash, hyphen
+
+KVP lines are field name in first column followed by colon
+optionally followed by whitespace and a value
+value continues from first non-whitespace to end of line
+if no value, defaults to empty string
+
+successive lines beginning with whitespace are a continuation
+leading whitespace will be stripped
+	number of characters stripped = size of smallest indent
+	must use identical indent string on all lines, whitespace after indent OK
+		TODO: this may be a bug, ask
+		@lib/RT/Interface/REST.pm:157
+
+trailing empty lines in value AFTER DE-INDENT will be dropped
+
+except for comment lines in the KVP block, invalid lines will be dropped
+an error will NOT be returned
+TODO: this is probably a bug, report it
+@lib/RT/Interface/REST.pm:165
+
+if a syntax error is found, $e is set to the form sans comment
+the line containing the error will be prefixed with '>> ' unless it already is
+
+TODO: what does the vsplit loop at the end do?

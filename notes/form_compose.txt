@@ -1,0 +1,24 @@
+@lib/RT/Interface/REST.pm:191
+
+takes an array (ref) of forms
+for each form, the output text is collected as described below
+the form output blocks are then joined with '\n--\n\n'
+
+if a comment block ($c) is present, it is output first
+any trailing blank lines are removed
+a single blank line is appended
+
+if an error block ($e) is present, it is output verbatim
+otherwise, if a key set ($o) is present, the KVPs are written (see below)
+otherwise any trailing whitespace is removed
+
+multi-line values will be written on their own, preceded and followed by a blank line
+each line after the first is indented to line up with the first content column in the first line
+however, if that would be more than 16 columns, they are indented four columns instead
+
+successive single-line values will be concatenated into a comma-space separated list
+if the appending a value would make the current line at least 70 columns,
+a comma will be added in the last column of the current line
+	and the value will be output on the next line
+wrapped lists behave exactly like multi-line values
+
