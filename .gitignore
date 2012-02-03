@@ -1,0 +1,3 @@
+
+# output directories in plugin projects
+/com.maltera.mylyn.*/bin/
