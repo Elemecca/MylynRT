@@ -21,6 +21,7 @@ import java.nio.CharBuffer;
 public class FormParser {
 	private CharBuffer source;
 	int position = 0;
+	int line = 0, column = 0;
 	int capture = -1;
 	
 	private Form form = new Form();
@@ -50,8 +51,25 @@ public class FormParser {
 		return true;
 	}
 	
+	private void match (String match)
+	throws FormSyntaxException {
+		int start_line = line, start_col = column;
+		for (int idx = 0; idx < match.length(); idx++) {
+			if (LA( 1 ) != match.charAt( idx ))
+				throw new FormSyntaxException( start_line, start_col,
+						"could not match '" + match + "'" );
+			consumeChar();
+		}
+	}
+	
 	private void consumeChar() {
 		position++;
+		if ('\n' == LA()) {
+			line++;
+			column = 0;
+		} else {
+			column++;
+		}
 	}
 	
 	/** Consumes up to and including the next newline.
@@ -97,21 +115,52 @@ public class FormParser {
 	}
 	
 	
-	private void matchKey() {
+	private String matchKey()
+	throws FormSyntaxException {
+		char la1;
+		
 		/* TODO: this should also support C(?:ustom)?F(?:ield)?-
 		 * per form_parse, but form_compose only generates CF.{} */
 		if (LA( 4 ) == '{') {
 			match( "CF.{" );
+			captureStart();
 			
+			la1 = LA( 1 ); // matches PCRE (?i:[\sa-z0-9_ :()/-]+)
+			while (('a' <= la1 && la1 <= 'z') || ('A' <= la1 && la1 <= 'Z')
+					|| ('0' <= la1 && la1 <= '9') || '_' == la1 || ':' == la1
+					|| '(' == la1 || ')' == la1 || '/' == la1 || '-' == la1
+					|| ' ' == la1 || Character.isWhitespace( la1 )) {
+				consumeChar();
+				la1 = LA( 1 );
+			}
+			
+			String value = captureEnd();
+			match( "}" );
+			
+			return value;
+		} else {
+			captureStart();
+			
+			la1 = LA( 1 ); // matches PCRE (?i:[a-z])
+			if (!( ('a' <= la1 && la1 <= 'z') || ('A' <= la1 && la1 <= 'Z') ))
+				throw new FormSyntaxException( line, column,
+						"non-custom fields must start with an alpha" );
+			
+			la1 = LA( 1 ); // matches PCRE (?i:[a-z0-9_-]*)
+			while (('a' <= la1 && la1 <= 'z') || ('A' <= la1 && la1 <= 'Z')
+					|| ('0' <= la1 && la1 <= '9') || '_' == la1 || '-' == la1) {
+				consumeChar();
+				la1 = LA( 1 );
+			}
+			
+			return captureEnd();
 		}
 	}
 	
-	private void matchEntry() {
-		int start = source.position() - 1;
-		while (null != current && ':' != current)
-			consumeChar();
-		String key = source.subSequence(
-				start, source.position() - 1 ).toString();
+	private void matchEntry()
+	throws FormSyntaxException {
+		String key = matchKey();
+		match( ":" );
 		
 		// there may be optional whitespace between colon and value
 		consumeSpace();
