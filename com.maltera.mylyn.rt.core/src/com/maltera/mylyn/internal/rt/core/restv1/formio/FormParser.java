@@ -88,7 +88,7 @@ public class FormParser {
 	
 	/** Consumes unlimited non-line break whitespace.
 	 */
-	private void consumeSpace() {
+	private void consumeWhitespace() {
 		try {
 			char current;
 			do {
@@ -115,7 +115,7 @@ public class FormParser {
 	}
 	
 	
-	private String matchKey()
+	String matchKey()
 	throws FormSyntaxException {
 		char la1;
 		
@@ -157,14 +157,33 @@ public class FormParser {
 		}
 	}
 	
+	private String matchValue()
+	throws FormSyntaxException {
+		captureStart();
+		
+		while ('\n' != LA( 1 )) consumeChar();
+		
+		return captureEnd();
+	}
+	
 	private void matchEntry()
 	throws FormSyntaxException {
 		String key = matchKey();
 		match( ":" );
 		
-		// there may be optional whitespace between colon and value
-		consumeSpace();
+		String value;
+		char la1 = LA( 1 );
+		if ('\n' == la1) {
+			consumeChar();
+			value = null;
+		} else if (Character.isWhitespace( la1 )) {
+			consumeWhitespace();
+			value = matchValue();
+		} else {
+			throw new FormSyntaxException( line, column,
+					"field value must be preceded by whitespace" );
+		}
 		
-		
+		form.add( key, value );
 	}
 }

@@ -27,9 +27,6 @@ it's always used with the case-insensitive modifier
 
 field names must start with an alpha
 allow only alphas, numbers, underbar, hyphen
-can be empty? repeater is '*'. probably shouldn't push it.
-	TODO: this might be a bug, ask
-	@lib/RT/Interface/REST.pm:73
 
 custom fields are enclosed in 'CF.{<name>}'
 permit alphas, digits, underbar, whitespace, colon, parens, slash, hyphen

@@ -24,6 +24,7 @@ import java.util.Map;
 public class Form {
 	private final Map<String, List<String>> keys =
 			new HashMap<String, List<String>>();
+	boolean validate = true;
 	
 	/** Monitor to prevent clobbering of new keys added concurrently. */
 	private final Object keyLock = new Object();
@@ -43,7 +44,7 @@ public class Form {
 		List<String> values = keys.get( key );
 		if (values != null) return values;
 		
-		this.validateKey( key );
+		if (validate) this.validateKey( key );
 		
 		synchronized (keyLock) {
 			// it might have been created while we were waiting on the lock
